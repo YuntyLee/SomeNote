@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>margin塌陷</title>
+  <style>
+    /* 只给子元素设置margin值时，父元素会跟随该margin值一起变化，这就是margin塌陷，塌陷仅存在于上下外边距 */
+    /* 解决方案：给父元素设置一个overflow:hidden的样式 */
+    .father {
+      height: 200px;
+      width: 300px;
+      background-color: blueviolet;
+      overflow: hidden;
+    }
+    .son {
+      height: 100px;
+      width: 100px;
+      background-color: burlywood;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="father">
+    <div class="son"></div>
+  </div>
+</body>
+
+</html>
