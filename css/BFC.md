@@ -78,12 +78,10 @@ Block-level box：display 属性为block，list-item，table的元素，会生�
  </div>
 ```
 
-
-
 添加overflow:hidden样式前
 
-![image-20210407005106710](C:\Users\Yunty\AppData\Roaming\Typora\typora-user-images\image-20210407005106710.png)
+![BFC-before](..\images\css\BFC-before.png)
 
 添加overflow:hidden样式后
 
-![image-20210407005119296](C:\Users\Yunty\AppData\Roaming\Typora\typora-user-images\image-20210407005119296.png)
+![BFC-after](..\images\css\BFC-after.png)
