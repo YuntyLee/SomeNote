@@ -1,4 +1,4 @@
-import {Message} from 'tinper-bee';
+import { Message } from 'tinper-bee';
 import axios from "axios";
 import moment from 'moment';
 import { domainName, COMMON_SERVICE_projectapply } from 'ucf-common/src/commonConfig'
@@ -11,21 +11,21 @@ if (hostname.includes(window.location.hostname)) {
 }
 
 
-export const success = (msg,duration = 10) => {
- 	//设置默认设置
-	Message.create({content: msg, color: 'success', duration: duration, icon: 'uf uf-arrow-c-o-down',style: {width: 'auto'}});
+export const success = (msg, duration = 10) => {
+	//设置默认设置
+	Message.create({ content: msg, color: 'success', duration: duration, icon: 'uf uf-arrow-c-o-down', style: { width: 'auto' } });
 }
 
-export const Error = (msg,duration = 10) => {
-	Message.create({content: msg, color: 'danger',  duration: duration,style: {width: 'auto'}});
+export const Error = (msg, duration = 10) => {
+	Message.create({ content: msg, color: 'danger', duration: duration, style: { width: 'auto' } });
 }
 
-export const Warning = (msg,duration = 10) => {
-	Message.create({content: msg, color: 'warning', duration: duration, style: {width: 'auto'}});
+export const Warning = (msg, duration = 10) => {
+	Message.create({ content: msg, color: 'warning', duration: duration, style: { width: 'auto' } });
 }
 
-export const Info = (msg,duration = 10) => {
-	Message.create({content: msg, color: 'info', duration: duration, style: {width: 'auto'}});
+export const Info = (msg, duration = 10) => {
+	Message.create({ content: msg, color: 'info', duration: duration, style: { width: 'auto' } });
 }
 /**
  * 数据返回统一处理函数
@@ -198,57 +198,57 @@ export const supplier = iSRM_tenantid() && iSRM_tenantid() !== "ifckxwyk";
  * 导出excel封装的新方法，只有一个对象入参
  * @param {*} param 
  */
-export function exportExcelPostNew (param = {}) {
+export function exportExcelPostNew(param = {}) {
 	return exportExcelPost(param.url, param.data || {}, param.name || '', param.grayscale || '', param.method || '', param.noKey || '')
 }
 /**
  * 导出excel 后端导出，通过post方式
  * grayscale 用作灰度引流标识请求头
  */
-export function exportExcelPost(url, data,...reset) {
+export function exportExcelPost(url, data, ...reset) {
 	const readyState = 2;//为了解决魔法值而定义
-	let locale = iSRM_locale() ||'zh_CN';
-	let  customId= iSRM_userLoginName() ||'';
+	let locale = iSRM_locale() || 'zh_CN';
+	let customId = iSRM_userLoginName() || '';
 	let [name, grayscale, method, noKey] = [...reset]
-	if(grayscale){
+	if (grayscale) {
 		customId = 'gray_cluster';
 	}
 	let pageCode = getPageCode()
-	return  axios({
+	return axios({
 		method: method || 'post',
 		url: url,
 		data: data,
 		responseType: 'blob',
-		headers:{
-			'X-Lang-Id':locale,
-			'X-custom-Id':customId,
+		headers: {
+			'X-Lang-Id': locale,
+			'X-custom-Id': customId,
 			'X-ISRM-UPP-RESOURCE': pageCode
 		}
 	}).then((res) => {
 		let { type } = res.data;
-		if(type.includes('application/json')){
+		if (type.includes('application/json')) {
 			let reader = new FileReader();
 			reader.readAsText(res.data)
 			reader.onload = e => {
 				if (e.target.readyState === readyState) {
 					let res = JSON.parse(e.target.result)
-					let { code, bo, other} = res || {};
-					if(code&&code.code!=='0000'){
+					let { code, bo, other } = res || {};
+					if (code && code.code !== '0000') {
 						let message = code.msg;
-						if(typeof bo === 'string'){
+						if (typeof bo === 'string') {
 							message = bo;
 						}
 						Error(`${lang.template('UCF_COMMON_00050203')/*"导出"*/}:${(message)}`);
-					}else{
-						if(typeof bo === 'string' && bo){
+					} else {
+						if (typeof bo === 'string' && bo) {
 							Info(`${lang.template('UCF_COMMON_00050203')/*"导出"*/}:${(bo)}`);
-						}else{
+						} else {
 							Error(`${lang.template('UCF_COMMON_00050203')/*"导出"*/}:${lang.template('UCF_COMMON_00050014')/*"接口提示成功,但是未正确返回文件流!"*/}`);
 						}
 					}
 				}
 			}
-		}else{
+		} else {
 			fileStreamHandling(res);
 		}
 		return true
@@ -258,18 +258,18 @@ export function exportExcelPost(url, data,...reset) {
 	})
 }
 //处理文件流
-export const fileStreamHandling = (res)=>{
-	if(res){
+export const fileStreamHandling = (res) => {
+	if (res) {
 		const content = res.data;
-		let contentDisposition = res.headers['content-disposition']&&res.headers['content-disposition'].split(';')||[];
-		let tempFileName = '' ;
-		for(let i=0,len=contentDisposition.length;i<len;i++){
-			let  temp  = contentDisposition[i]
-			if(getType(temp) === 'string'&&temp.split('=')[0].startsWith('filename')){
+		let contentDisposition = res.headers['content-disposition'] && res.headers['content-disposition'].split(';') || [];
+		let tempFileName = '';
+		for (let i = 0, len = contentDisposition.length; i < len; i++) {
+			let temp = contentDisposition[i]
+			if (getType(temp) === 'string' && temp.split('=')[0].startsWith('filename')) {
 				let nameValue = temp.split('=')[1];
-				if(nameValue.startsWith('utf-8')){
-					tempFileName = nameValue&&decodeURIComponent(nameValue.split("'")[2]);
-				}else{
+				if (nameValue.startsWith('utf-8')) {
+					tempFileName = nameValue && decodeURIComponent(nameValue.split("'")[2]);
+				} else {
 					tempFileName = nameValue;
 				}
 			}
@@ -299,10 +299,10 @@ export const fileStreamHandling = (res)=>{
  * 上传excel 到后端，通过post方式
  * grayscale 灰度引流的标识请求头，默认为false
  */
-export function importExcelPost(url, data,string,grayscale = false, noKey) {//string为error,需要错误的结果，为success需要正确结果
-	let locale = iSRM_locale() ||'zh_CN';
-	let  customId= iSRM_userLoginName() ||'';
-	if(grayscale){
+export function importExcelPost(url, data, string, grayscale = false, noKey) {//string为error,需要错误的结果，为success需要正确结果
+	let locale = iSRM_locale() || 'zh_CN';
+	let customId = iSRM_userLoginName() || '';
+	if (grayscale) {
 		customId = 'gray_cluster';
 	}
 	let pageCode = getPageCode()
@@ -310,39 +310,39 @@ export function importExcelPost(url, data,string,grayscale = false, noKey) {//st
 		method: 'post',
 		url: url,
 		data: data,
-		catch:false,
-		processData:false,
-		contentType:false,
-		headers:{
-			'X-Lang-Id':locale,
-			'X-custom-Id':customId,
+		catch: false,
+		processData: false,
+		contentType: false,
+		headers: {
+			'X-Lang-Id': locale,
+			'X-custom-Id': customId,
 			'X-ISRM-UPP-RESOURCE': pageCode
 		}
 	}).then((res) => {
 		let type = res.headers && res.headers['content-type'];
-		if(!type.includes('application/json')){
+		if (!type.includes('application/json')) {
 			fileStreamHandling(res);
-		}else{
-			let { code, bo, other} = res.data||{};
-			if(code&&code.code!=='0000'){
-				if(code.code === '0002'){ //运保寻源协议导入时，错误信息要以文件的形式导出
-					bo && exportExcelPost(`${COMMON_SERVICE_projectapply}/sourcing/projectapply/file/${bo}`, '' , '', true, 'get');
-					return ;//不再往下走
+		} else {
+			let { code, bo, other } = res.data || {};
+			if (code && code.code !== '0000') {
+				if (code.code === '0002') { //运保寻源协议导入时，错误信息要以文件的形式导出
+					bo && exportExcelPost(`${COMMON_SERVICE_projectapply}/sourcing/projectapply/file/${bo}`, '', '', true, 'get');
+					return;//不再往下走
 				}
 				let message = code.msg;
-				if(typeof bo === 'string'){
+				if (typeof bo === 'string') {
 					message = bo;
 				}
-				if(string==="error"){
+				if (string === "error") {
 					return res;
-				}else{
+				} else {
 					Error(`${lang.template('UCF_COMMON_00050125')/*导入*/}:${(message)}`);
 					return false;
 				}
-			}else{
-				if(string==="success"){
+			} else {
+				if (string === "success") {
 					return bo;
-				}else{
+				} else {
 					success(lang.template('UCF_COMMON_00050027')/*导入成功*/);
 					return true;
 				}
@@ -356,20 +356,20 @@ export function importExcelPost(url, data,string,grayscale = false, noKey) {//st
 const httpCode = [401, 306, 403];
 
 // 对接口报错后的状态码统一处理
-export function errResponseHandle (err, errMsg) {
+export function errResponseHandle(err, errMsg) {
 	if (err.response && err.response.status == httpCode[0]) {
 		Error(err.response.data && err.response.data.msg || lang.template('UCF_COMMON_HAND_00000144'/* 登录信息失效，系统退出，请重新登录 */));
-			setTimeout(() => {
-				toLoginOut();
-			}, 500)
+		setTimeout(() => {
+			toLoginOut();
+		}, 500)
 	} else if (err.response && err.response.status == httpCode[1]) {
 		Error(lang.template('UCF_COMMON_HAND_00000076'/*登录时间超过8小时，登录信息已失效，请重新登录*/));
-			setTimeout(() => {
-				toLoginOut();
-			}, 500)
-	} else if(err.response && err.response.status == httpCode[2]) {
+		setTimeout(() => {
+			toLoginOut();
+		}, 500)
+	} else if (err.response && err.response.status == httpCode[2]) {
 		Error(lang.template('UCF_COMMON_HAND_00000141'/*无此页面权限，请检查或重新登录*/));
-  } else {
+	} else {
 		console.log(errMsg, err);
 		Error(errMsg);
 	}
@@ -467,28 +467,28 @@ export function handleChild(parentArray, child, type) {
 }
 
 //获取数据类型
-export function getType(obj){
+export function getType(obj) {
 	var toString = Object.prototype.toString;
 	var map = {
-		'[object Boolean]'  : 'boolean',
-		'[object Number]'   : 'number',
-		'[object String]'   : 'string',
-		'[object Function]' : 'function',
-		'[object Array]'    : 'array',
-		'[object Date]'     : 'date',
-		'[object RegExp]'   : 'regExp',
+		'[object Boolean]': 'boolean',
+		'[object Number]': 'number',
+		'[object String]': 'string',
+		'[object Function]': 'function',
+		'[object Array]': 'array',
+		'[object Date]': 'date',
+		'[object RegExp]': 'regExp',
 		'[object Undefined]': 'undefined',
-		'[object Null]'     : 'null',
-		'[object Object]'   : 'object'
+		'[object Null]': 'null',
+		'[object Object]': 'object'
 	};
 	return map[toString.call(obj)];
 }
 
 //深度合并两个对象，或数组
-export function merge(data1, data2){
+export function merge(data1, data2) {
 
-	if(getType(data1) != getType(data2)){
-		return ;
+	if (getType(data1) != getType(data2)) {
+		return;
 	}
 	return Object.assign(data1, data2)
 }
@@ -497,20 +497,20 @@ export function merge(data1, data2){
 export function deepClone(data) {
 	let type = getType(data);
 	var obj;
-	if(type === 'array'){
+	if (type === 'array') {
 		obj = [];
-	} else if(type === 'object'){
+	} else if (type === 'object') {
 		obj = {};
 	} else {
 		//不再具有下一层次
 		return data;
 	}
-	if(type === 'array'){
-		for(var i = 0, len = data.length; i < len; i++){
+	if (type === 'array') {
+		for (var i = 0, len = data.length; i < len; i++) {
 			obj.push(deepClone(data[i]));
 		}
-	} else if(type === 'object'){
-		for(var key in data){
+	} else if (type === 'object') {
+		for (var key in data) {
 			obj[key] = deepClone(data[key]);
 		}
 	}
@@ -523,7 +523,7 @@ export function deepClone(data) {
  */
 export function resultDataAdditional(arrayobject) {
 	if (Array.isArray(arrayobject)) {
-		return Array.from(arrayobject, (x, i) => ({...x, key: i}))
+		return Array.from(arrayobject, (x, i) => ({ ...x, key: i }))
 
 	} else {
 		return [];
@@ -568,8 +568,8 @@ export function deepAssign(preData, nextData) {
  * @returns {{list: *, pageIndex: *, totalPages: *, total: *, pageSize: *}}
  */
 export function structureObj(obj, param) {
-	const {content, number, totalPages, totalElements, size} = obj;
-	let {pageSize} = param;
+	const { content, number, totalPages, totalElements, size } = obj;
+	let { pageSize } = param;
 	if (!pageSize) {
 		pageSize = size;
 	}
@@ -589,7 +589,7 @@ export function structureObj(obj, param) {
  * @returns {{list: Array, pageIndex: number, totalPages: number, total: number, pageSize: *}}
  */
 export function initStateObj(obj) {
-	const {pageSize} = obj;
+	const { pageSize } = obj;
 	return {
 		list: [],
 		pageIndex: 0,
@@ -789,14 +789,14 @@ export function getHeight() {
  * @param {*} sortParam 排序参数对象数组
  * @returns {Array} 返回排序属性
  */
-export function getSortMap(sortParam){
+export function getSortMap(sortParam) {
 	// 升排序
 	const orderSortParam = sortParam.sort((a, b) => {
 		return a["orderNum"] - b["orderNum"];
 	})
 	let sortMap = [];
 	sortMap = orderSortParam.map((sortItem, index) => {
-		const {order, field} = sortItem,
+		const { order, field } = sortItem,
 			tempObj = {}; // order 排序方式，field排序字段
 		const direction = (order === 'ascend' ? "ASC" : "DESC"); //  前后端约定
 		let property = field;
@@ -815,7 +815,7 @@ export function getSortMap(sortParam){
  * @param {*} value
  * @param {*} type type为0标识为pageIndex,为1标识pageSize
  */
-export function getPageParam (value, type,pageParams){
+export function getPageParam(value, type, pageParams) {
 	let { pageIndex, pageSize } = pageParams;
 	if (type === 0) {
 		pageIndex = value - 1;
@@ -833,10 +833,10 @@ export function getPageParam (value, type,pageParams){
  * @param {*} str 替换的模板
  * @param {*} data 需要替换的数据
  */
-export function stringFormat(str,data) {
-	if(!data) return '';
+export function stringFormat(str, data) {
+	if (!data) return '';
 	let keys = Object.keys(data);
-	keys.forEach(key=>{
+	keys.forEach(key => {
 		let reg = new RegExp("({" + key + "})", "g");
 		str = str.replace(reg, data[key]);
 	});
@@ -848,27 +848,27 @@ export function stringFormat(str,data) {
  *
  * @param {*} list 类别数组
  */
-export function classListToTree(list){
-	let first=[],second =[],third=[]
-	list.map(i=>{
-		i.id=i.classNo
-		i.value=i.name
-		if(i.smallNo=='00'&& i.subSmallNo=='00'){
+export function classListToTree(list) {
+	let first = [], second = [], third = []
+	list.map(i => {
+		i.id = i.classNo
+		i.value = i.name
+		if (i.smallNo == '00' && i.subSmallNo == '00') {
 			first.push(i)
-		}else if(i.smallNo!='00'&& i.subSmallNo=='00'){
+		} else if (i.smallNo != '00' && i.subSmallNo == '00') {
 			second.push(i)
-		}else{
+		} else {
 			third.push(i)
 		}
 	})
-	second.map(s=>{
-		let children=third.filter(t=>t.masterNo==s.masterNo&&t.smallNo==s.smallNo)
-		s.children=children;
+	second.map(s => {
+		let children = third.filter(t => t.masterNo == s.masterNo && t.smallNo == s.smallNo)
+		s.children = children;
 		return s;
 	})
-	first.map(f=>{
-		let children=second.filter(t=>t.masterNo==f.masterNo)
-		f.children=children;
+	first.map(f => {
+		let children = second.filter(t => t.masterNo == f.masterNo)
+		f.children = children;
 		return f;
 	})
 	return first;
@@ -883,12 +883,12 @@ export function formatUrl(item) {// 格式化url format
 	let uri = " ";
 	if (item.urltype === 'url') {
 		uri = item.location;
-		if(uri.indexOf('?')!==-1){
-			uri+="&modulefrom=sidebar";
-		}else{
-			uri+="?modulefrom=sidebar"
+		if (uri.indexOf('?') !== -1) {
+			uri += "&modulefrom=sidebar";
+		} else {
+			uri += "?modulefrom=sidebar"
 		}
-		return  uri;
+		return uri;
 	} else if (item.urltype === 'plugin') {
 		// uri = item.funcCode ? ('#/' + item.funcCode) : "#/index_plugin";
 		// uri = `${GROBAL_WBALONE_HTTP_CTX}/`+encodeURIComponent(encodeURIComponent('index-view.html'+uri));
@@ -912,9 +912,9 @@ export function formatUrl(item) {// 格式化url format
 		//     uri+="?modulefrom=sidebar"
 		// }
 		// return `${GROBAL_WBALONE_HTTP_CTX}/`+'index-view.html#'+uri;
-	}else if(item.urltype === undefined){
+	} else if (item.urltype === undefined) {
 		item.location = '404';
-		return  '#/ifr/' + encodeURIComponent(encodeURIComponent(item.location));
+		return '#/ifr/' + encodeURIComponent(encodeURIComponent(item.location));
 	}
 	else {
 		return item.location;
@@ -929,10 +929,10 @@ export function formatUrl(item) {// 格式化url format
  * 英文环境下取title2
  * 繁体中文环境下取title3
  */
-export function openmenuClick(item){   //打开新页签点击方法
+export function openmenuClick(item) {   //打开新页签点击方法
 	let url = formatUrl(item); //调用url格式化方法
 	window.top.createTab && window.top.createTab({  //window.top.createTab 框架中打开新页签的方法
-		title:item.title,
+		title: item.title,
 		id: item.id,
 		router: url,
 		title2: item.enTitle || item.title,//enTitle 是英文标题，当没有英文标题时取中文标题
@@ -970,10 +970,10 @@ export const arrIntervalInsert = (arr, el) => {
 }
 
 /*根据传入的列信息取出当前显示的列,并且以字符串数组的形式返回*/
-export function getCurrentColumns(columns =[]){
+export function getCurrentColumns(columns = []) {
 	let currentColumns = [];
-	for(let i=0,len=columns.length||0;i<len;i++){
-		if(columns[i].ifshow !== false){
+	for (let i = 0, len = columns.length || 0; i < len; i++) {
+		if (columns[i].ifshow !== false) {
 			currentColumns.push(columns[i].dataIndex);
 		}
 	}
@@ -986,13 +986,13 @@ export function getCurrentColumns(columns =[]){
  * @param hasOperationButton  是否有表格操作按钮
  * @returns {Number|number}  返回垂直高度
  */
-export const listByViewHieight= (hasOperationButton= false)=>{
+export const listByViewHieight = (hasOperationButton = false) => {
 	let viewHeight = Math.max(document.body.clientHeight, document.documentElement.clientHeight);//网页内容可视区域
-	let searchAreaHeight = document.getElementById('search-panel') && document.getElementById('search-panel').offsetHeight ;
-	if(searchAreaHeight && viewHeight){
-		if(hasOperationButton){ //表格有操作按钮
+	let searchAreaHeight = document.getElementById('search-panel') && document.getElementById('search-panel').offsetHeight;
+	if (searchAreaHeight && viewHeight) {
+		if (hasOperationButton) { //表格有操作按钮
 			return (viewHeight - searchAreaHeight - 190) < 300 ? 300 : (viewHeight - searchAreaHeight - 190); // 为了用户能查看更多数据，最小高度300
-		}else{
+		} else {
 			return (viewHeight - searchAreaHeight - 140) < 300 ? 300 : (viewHeight - searchAreaHeight - 140);// 为了用户能查看更多数据，最小高度300
 		}
 
@@ -1001,10 +1001,10 @@ export const listByViewHieight= (hasOperationButton= false)=>{
 }
 
 //专用于多语  将ucf-common下的多语和工程本身的多语合并
-export const multilingualObj = (proLang={},commonLang={})=>{
+export const multilingualObj = (proLang = {}, commonLang = {}) => {
 	let multilingualObj = {};
-	multilingualObj.zhcn = Object.assign(proLang.zhcn,commonLang.zhcn);
-	multilingualObj.enus = Object.assign(proLang.enus,commonLang.enus);
+	multilingualObj.zhcn = Object.assign(proLang.zhcn, commonLang.zhcn);
+	multilingualObj.enus = Object.assign(proLang.enus, commonLang.enus);
 	return multilingualObj;
 }
 
@@ -1014,10 +1014,10 @@ export const multilingualObj = (proLang={},commonLang={})=>{
  * @param digit  要处理数据的幂，如：5^2
  * @returns {number}
  */
-export const formatFloat = function(number,digit = 6) {
+export const formatFloat = function (number, digit = 6) {
 	let tempNumber = Number(number);
-	let m = Math.pow(10,digit);
-	return Math.round(tempNumber*m)/m
+	let m = Math.pow(10, digit);
+	return Math.round(tempNumber * m) / m
 }
 
 
@@ -1027,17 +1027,17 @@ export const formatFloat = function(number,digit = 6) {
  * @param pageIndex 第几页
  * @param data 原始数据
  */
-export const frontendPaging = function (pageSize = 10,pageIndex = 1,data = []){
+export const frontendPaging = function (pageSize = 10, pageIndex = 1, data = []) {
 	let pageData = [];
-	let total = data.length||0;
-	let pages = pageSize>0?Math.ceil(total/pageSize):0;//向上取整
+	let total = data.length || 0;
+	let pages = pageSize > 0 ? Math.ceil(total / pageSize) : 0;//向上取整
 	let start = (pageSize * pageIndex) - pageSize; //从第几条开发
 	let end = pageSize * pageIndex; //到第几条结束
-	end = end > total?total:end;
-	for(let i = start;i < end;i++){
+	end = end > total ? total : end;
+	for (let i = start; i < end; i++) {
 		pageData.push(data[i]);
 	}
-	return {pageSize,pageIndex,pageData,total,pages}
+	return { pageSize, pageIndex, pageData, total, pages }
 }
 
 
@@ -1047,8 +1047,8 @@ export const frontendPaging = function (pageSize = 10,pageIndex = 1,data = []){
  * @param num  要保留的位数
  * @returns {number}
  */
-export const amountToFixedEmpty = function(text='',num=0) {
-	return (text&&Number(text).toFixed(num)) || (text==0?Number(0).toFixed(num):'')
+export const amountToFixedEmpty = function (text = '', num = 0) {
+	return (text && Number(text).toFixed(num)) || (text == 0 ? Number(0).toFixed(num) : '')
 }
 
 
@@ -1061,28 +1061,28 @@ export const amountToFixedEmpty = function(text='',num=0) {
  * @param len 代码长度位数
  * 返回数组
  */
-export const batchCodeCheck = function(colName,value,len){
-	let tempValue = value&&value.trim().replace(/\s+/g,",");//替换空格为逗号
-	tempValue = tempValue.replace(/，/ig,',');//中文逗号转英文逗号
-	let items =  tempValue&&tempValue.split(',')||[];
+export const batchCodeCheck = function (colName, value, len) {
+	let tempValue = value && value.trim().replace(/\s+/g, ",");//替换空格为逗号
+	tempValue = tempValue.replace(/，/ig, ',');//中文逗号转英文逗号
+	let items = tempValue && tempValue.split(',') || [];
 	items = Array.from(new Set(items));
-	items = items.filter((item)=> item.length>0);
+	items = items.filter((item) => item.length > 0);
 	let itemArr = [];//保存正确的代码
 	let errorArr = [];//保存错误的代码
-	if(items && items.length>0){
-		items.forEach((item)=>{
-			if(item.length == len){
+	if (items && items.length > 0) {
+		items.forEach((item) => {
+			if (item.length == len) {
 				itemArr.push(item);
-			}else{
+			} else {
 				errorArr.push(item);
 			}
 		});
 	}
-	if(errorArr.length>0){
+	if (errorArr.length > 0) {
 		Error(`${colName} ${lang.template('UCF_COMMON_HAND_00000095')/*输入错误*/}. 
 		${lang.template('UCF_COMMON_HAND_00000096')/*请输入*/}${len}${lang.template('UCF_COMMON_HAND_00000097')/*位*/}${colName}. 
 		${lang.template('UCF_COMMON_HAND_00000098')/*如有多个请使用英文逗号分隔*/}`
-		,10);
+			, 10);
 		return false;
 	}
 	return itemArr;
@@ -1119,27 +1119,27 @@ export function isBoBase() {
  * params.iSRM_cover 上一个页面是否需要重新加载，true为需要
  * 
  */
-export function iSRM_openPage(params = {}){
+export function iSRM_openPage(params = {}) {
 	if (isBoBase()) {
 		// 门户打开新页签的方法
 		const locale = iSRM_locale();
 		// 跳详情
-		if(params.iSRM_type === 'info'){
+		if (params.iSRM_type === 'info') {
 			const origin = window.location.origin
 			message.emit('open', {
 				type: 'link',
-				appCode: supplier? 'ztea_iSRMW_external':'ztea_iSRM',
-				code: params.code||"",//'唯一编码，非必须，有值的话先判断是否已经打开过，如果已经打开，则切换到打开的页签，否则打开url对应页面',
+				appCode: supplier ? 'ztea_iSRMW_external' : 'ztea_iSRM',
+				code: params.code || "",//'唯一编码，非必须，有值的话先判断是否已经打开过，如果已经打开，则切换到打开的页签，否则打开url对应页面',
 				name: locale === 'zh_CN' ? params.title : params.enTitle || params.title,
-				cover: typeof (params.iSRM_cover) === 'boolean'? params.iSRM_cover: true,//非必须，iSRM_cover为true时且指定了code，会自动替换原打开的code页签并切换刷新
-				url: params.url||`${origin}${params.location}`,
+				cover: typeof (params.iSRM_cover) === 'boolean' ? params.iSRM_cover : true,//非必须，iSRM_cover为true时且指定了code，会自动替换原打开的code页签并切换刷新
+				url: params.url || `${origin}${params.location}`,
 			})
 		} else {
 			message.emit('open', {
 				type: 'page',
-				appCode: supplier? 'ztea_iSRMW_external':'ztea_iSRM',
-				pageCode: supplier? 'ztef_iSRMG_'+params.pageCode:'ztef_iSRMC_'+params.pageCode,
-				cover: typeof (params.iSRM_cover) === 'boolean'? params.iSRM_cover: true, // 非必须，iSRM_cover为true时，相同应用、页面编码，会自动替换并刷新原页签
+				appCode: supplier ? 'ztea_iSRMW_external' : 'ztea_iSRM',
+				pageCode: supplier ? 'ztef_iSRMG_' + params.pageCode : 'ztef_iSRMC_' + params.pageCode,
+				cover: typeof (params.iSRM_cover) === 'boolean' ? params.iSRM_cover : true, // 非必须，iSRM_cover为true时，相同应用、页面编码，会自动替换并刷新原页签
 				query: params.query || {} // 路由参数，会加到地址后面，跟vue-router的query一致
 			})
 		}
@@ -1147,7 +1147,7 @@ export function iSRM_openPage(params = {}){
 		// iuap门户打开新页面的方法
 		let url = formatUrl(params); //调用url格式化方法
 		window.top.createTab && window.top.createTab({  //window.top.createTab 框架中打开新页签的方法
-			title:params.title,
+			title: params.title,
 			id: params.id,
 			router: url,
 			title2: params.enTitle || params.title,//enTitle 是英文标题，当没有英文标题时取中文标题
@@ -1168,9 +1168,9 @@ export function iSRM_openPage(params = {}){
 export function openMenu(openmenu) {   //打开新页签-菜单
 	message.emit('open', {
 		type: 'page',
-		appCode: supplier? 'ztea_iSRMW_external':'ztea_iSRM',
-		pageCode: supplier? 'ztef_iSRMG_'+openmenu.pageCode:'ztef_iSRMC_'+openmenu.pageCode,
-		cover: typeof (openmenu.cover) === 'boolean'? openmenu.cover: true, // 非必须，cover为true时，相同应用、页面编码，会自动替换并刷新原页签
+		appCode: supplier ? 'ztea_iSRMW_external' : 'ztea_iSRM',
+		pageCode: supplier ? 'ztef_iSRMG_' + openmenu.pageCode : 'ztef_iSRMC_' + openmenu.pageCode,
+		cover: typeof (openmenu.cover) === 'boolean' ? openmenu.cover : true, // 非必须，cover为true时，相同应用、页面编码，会自动替换并刷新原页签
 		query: openmenu.query || {} // 路由参数，会加到地址后面，跟vue-router的query一致
 	})
 }
@@ -1187,17 +1187,17 @@ export function openTabClick(opentab) {   //打开新页签-绝对地址
 	const origin = window.location.origin
 	const pageCode = opentab.pageCode || getPageCode()
 	let uri = opentab.url || `${origin}${opentab.location}`
-	if(uri.indexOf('?')!==-1){
-		uri+=`&pageCode=${pageCode}`;
-	}else{
-		uri+=`?pageCode=${pageCode}`
+	if (uri.indexOf('?') !== -1) {
+		uri += `&pageCode=${pageCode}`;
+	} else {
+		uri += `?pageCode=${pageCode}`
 	}
 	message.emit('open', {
 		type: 'link',
-		appCode: supplier? 'ztea_iSRMW_external':'ztea_iSRM',
+		appCode: supplier ? 'ztea_iSRMW_external' : 'ztea_iSRM',
 		code: opentab.code || opentab.id || "",//'唯一编码，非必须，有值的话先判断是否已经打开过，如果已经打开，则切换到打开的页签，否则打开url对应页面',
 		name: locale === 'zh_CN' ? opentab.title : opentab.enTitle || opentab.title,
-		cover: typeof (opentab.cover) === 'boolean'? opentab.cover: true,//非必须，cover为true时且指定了code，会自动替换原打开的code页签并切换刷新
+		cover: typeof (opentab.cover) === 'boolean' ? opentab.cover : true,//非必须，cover为true时且指定了code，会自动替换原打开的code页签并切换刷新
 		url: uri,
 	})
 }
@@ -1214,11 +1214,11 @@ export function closeTab() {   //关闭当前页面
  * @param
  */
 export function getPageCode() {
-	try{
+	try {
 		if (!isBoBase() && window.document.referrer.indexOf('wbalone') === -1) {
 			return 'iSRM';//单点登录
 		}
-	  let search = "?" +  window.location.hash.split("?")[1]
+		let search = "?" + window.location.hash.split("?")[1]
 		let searchObj = queryString.parse(search)
 		return searchObj.pageCode || "iSRM"
 	} catch (e) {
@@ -1279,20 +1279,20 @@ export const checkCookies = () => {
 		}
 	}
 	let hostname = ['iscp.zte.com.cn', 'isrm.zte.com.cn'];
-	if(hostname.includes(window.location.hostname) && !iuapCookieFlag){
-			window.TINGYUN.ty_track_event('100000452129', 'iSRM_Fe_Error_Event', {
-					empNo: iSRM_userLoginName(),
-					productname: 'CookieInfo',
-					optime: new Date(),
-					event_path: window.document.cookie + 'AND' +errorType
-			})
+	if (hostname.includes(window.location.hostname) && !iuapCookieFlag) {
+		window.TINGYUN.ty_track_event('100000452129', 'iSRM_Fe_Error_Event', {
+			empNo: iSRM_userLoginName(),
+			productname: 'CookieInfo',
+			optime: new Date(),
+			event_path: window.document.cookie + 'AND' + errorType
+		})
 	}
 	return iuapCookieFlag && Boolean(uacAuth) && Boolean(ucsAuth);
 };
 
 export const checkUac = () => {
 	const user = getCookie('ZTEDPGSSOUser') || getCookie('PORTALSSOUser') || getCookie('UCSLoginName') || '';
-	const token =  getCookie('ZTEDPGSSOCookie') || getCookie('PORTALSSOCookie') || getCookie('UCSSSOToken') || '';
+	const token = getCookie('ZTEDPGSSOCookie') || getCookie('PORTALSSOCookie') || getCookie('UCSSSOToken') || '';
 	return Boolean(user) && Boolean(token);
 }
 export const checkIuap = () => {
@@ -1341,7 +1341,7 @@ export const checkIuap = () => {
 		}
 	}
 	let hostname = ['iscp.zte.com.cn', 'isrm.zte.com.cn'];
-	if(hostname.includes(window.location.hostname) && !iuapCookieFlag){
+	if (hostname.includes(window.location.hostname) && !iuapCookieFlag) {
 		window.TINGYUN.ty_track_event('100000452129', 'iSRM_Fe_Error_Event', {
 			empNo: iSRM_userLoginName(),
 			productname: 'CookieInfo',
@@ -1357,7 +1357,7 @@ export const checkIuap = () => {
  * 1.判断相关cookie 有没有，没有的话就跳转到登录页面，有的话留在当前页面
  * 2.再判断用户访问的是不是当个页面（排除掉app页面，即既不是wbalone 也不是app页面）,不是单个页面不用操作
  */
- export const routerRedirect = async () => {
+export const routerRedirect = async () => {
 	let host = window.location.hostname;
 	if (host === 'iscp.zte.com.cn') {
 		routerRedirectWithProd();
@@ -1439,55 +1439,55 @@ export const routerRedirectWithUat = async () => {
 export function getPortalId() {
 	let parentUrl = window.document.referrer
 	console.log('埋点parentUrl', parentUrl)
-    let portalId = '7665419869850600514'
-    // 生产环境采方
-    if (parentUrl && (parentUrl.indexOf('/iscp.zte.com.cn') > -1)) {
-	  portalId = '7791533280263963061'
-    }
-    // 生产环境供方
-    if (parentUrl && (parentUrl.indexOf('/isrm.zte.com.cn') > -1)) {
-	  portalId = '6548569287267448304'
-    }
-    // 验收环境采方
-    if (parentUrl && (parentUrl.indexOf('/iscp.uat.zte.com.cn') > -1)) {
-	  portalId = '828995132871614899'
-    }
-    // 验收环境供方
-    if (parentUrl && (parentUrl.indexOf('/isrm.uat.zte.com.cn') > -1)) {
+	let portalId = '7665419869850600514'
+	// 生产环境采方
+	if (parentUrl && (parentUrl.indexOf('/iscp.zte.com.cn') > -1)) {
+		portalId = '7791533280263963061'
+	}
+	// 生产环境供方
+	if (parentUrl && (parentUrl.indexOf('/isrm.zte.com.cn') > -1)) {
+		portalId = '6548569287267448304'
+	}
+	// 验收环境采方
+	if (parentUrl && (parentUrl.indexOf('/iscp.uat.zte.com.cn') > -1)) {
+		portalId = '828995132871614899'
+	}
+	// 验收环境供方
+	if (parentUrl && (parentUrl.indexOf('/isrm.uat.zte.com.cn') > -1)) {
 		portalId = '1720674371309031589'
-    }
-    // 测试环境
-    if (parentUrl && (parentUrl.indexOf('/isrm.test.zte.com.cn') > -1)) {
+	}
+	// 测试环境
+	if (parentUrl && (parentUrl.indexOf('/isrm.test.zte.com.cn') > -1)) {
 		portalId = '6728678515646009381'
-    }
-    // 开发环境
-    if (parentUrl && (parentUrl.indexOf('/isrm.dev.zte.com.cn') > -1)) {
+	}
+	// 开发环境
+	if (parentUrl && (parentUrl.indexOf('/isrm.dev.zte.com.cn') > -1)) {
 		portalId = '7665419869850600514'
 	}
 	return portalId
 }
 // UAC3.0 应用ID 接入评审中心
-export function getReviewId () {
+export function getReviewId() {
 	const hostname = window.location.hostname
 	let reviewId = ''
 	switch (hostname) {
-	  case 'iscp.zte.com.cn':
-		// 生产环境
-		reviewId = '10008'
-		break
-	  case 'uat.iscp.zte.com.cn':
-		// 验收环境
-		reviewId = '830129071712'
-		break
-	  case 'test.iscp.zte.com.cn':
-		// 测试环境
-		reviewId = 'iSRM'
-		break
-	  default:
-		reviewId = 'iSRM'
+		case 'iscp.zte.com.cn':
+			// 生产环境
+			reviewId = '10008'
+			break
+		case 'uat.iscp.zte.com.cn':
+			// 验收环境
+			reviewId = '830129071712'
+			break
+		case 'test.iscp.zte.com.cn':
+			// 测试环境
+			reviewId = 'iSRM'
+			break
+		default:
+			reviewId = 'iSRM'
 	}
 	return reviewId
-  }
+}
 // 退出登录
 export const logOut = () => {
 	let UCSCookie = [
@@ -1512,19 +1512,19 @@ export const logOutWithUac = () => {
 	// 生产环境接入UAC
 	if (host === 'iscp.zte.com.cn') {
 		window.TINGYUN.ty_track_event('100000452129', 'iSRM_Fe_Error_Event', {
-				empNo: iSRM_userLoginName(),
-				productname: 'iSRM_LogOutUAC',
-				optime: new Date(),
-				event_path: window.document.cookie
+			empNo: iSRM_userLoginName(),
+			productname: 'iSRM_LogOutUAC',
+			optime: new Date(),
+			event_path: window.document.cookie
 		})
 		let isSupplier = iSRM_tenantid() && iSRM_tenantid() !== "ifckxwyk";
 		if (isSupplier) {
 			//供应商用户，清除iuap cookie，跳转至scc登录页面
 			let iuapCookies = ['_A_P_integration', '_A_P_userAvator', '_A_P_userId', '_A_P_userLoginName', '_A_P_userName', '_A_P_userType', '_TH_',
-			'default_serial', 'i18next', 'iscpToSccToken', 'locale_serial', 'loginChannel', 'sessionid', 'tenantid', 'typeAlias', 'u_locale',
-			'u_logints', 'u_usercode', 'userId', 'userType'];
-			for(let i = 0; i < iuapCookies.length; i++) {
-				if(getCookie(iuapCookies[i])){
+				'default_serial', 'i18next', 'iscpToSccToken', 'locale_serial', 'loginChannel', 'sessionid', 'tenantid', 'typeAlias', 'u_locale',
+				'u_logints', 'u_usercode', 'userId', 'userType'];
+			for (let i = 0; i < iuapCookies.length; i++) {
+				if (getCookie(iuapCookies[i])) {
 					delCookie(iuapCookies[i], { domain: 'iscp.zte.com.cn' })
 				}
 			}
@@ -1557,19 +1557,19 @@ export const logOutWithIuap = () => {
 	// 生产环境接入UAC
 	if (host === 'iscp.zte.com.cn') {
 		window.TINGYUN.ty_track_event('100000452129', 'iSRM_Fe_Error_Event', {
-				empNo: iSRM_userLoginName(),
-				productname: 'iSRM_LogOutIuap',
-				optime: new Date(),
-				event_path: window.document.cookie
+			empNo: iSRM_userLoginName(),
+			productname: 'iSRM_LogOutIuap',
+			optime: new Date(),
+			event_path: window.document.cookie
 		})
 		let isSupplier = iSRM_tenantid() && iSRM_tenantid() !== "ifckxwyk";
 		if (isSupplier) {
 			//供应商用户，清除iuap cookie，跳转至scc登录页面
 			let iuapCookies = ['_A_P_integration', '_A_P_userAvator', '_A_P_userId', '_A_P_userLoginName', '_A_P_userName', '_A_P_userType', '_TH_',
-			'default_serial', 'i18next', 'iscpToSccToken', 'locale_serial', 'loginChannel', 'sessionid', 'tenantid', 'typeAlias', 'u_locale',
-			'u_logints', 'u_usercode', 'userId', 'userType'];
-			for(let i = 0; i < iuapCookies.length; i++) {
-				if(getCookie(iuapCookies[i])){
+				'default_serial', 'i18next', 'iscpToSccToken', 'locale_serial', 'loginChannel', 'sessionid', 'tenantid', 'typeAlias', 'u_locale',
+				'u_logints', 'u_usercode', 'userId', 'userType'];
+			for (let i = 0; i < iuapCookies.length; i++) {
+				if (getCookie(iuapCookies[i])) {
 					delCookie(iuapCookies[i], { domain: 'iscp.zte.com.cn' })
 				}
 			}
@@ -1625,18 +1625,18 @@ export function toLoginOut() {
 	]
 
 	for (let i = 0; i < cookieArrs.length; i++) {
-		if(getCookie(cookieArrs[i])){
+		if (getCookie(cookieArrs[i])) {
 			delCookie(cookieArrs[i])
 		}
 	}
-	if(!iSRM_tenantid() || iSRM_tenantid() === ifckxwyk ){
-			message.emit('logout')
-	}else{
-		if(window.document.referrer.indexOf('/isrm.zte.com.cn') > -1){
+	if (!iSRM_tenantid() || iSRM_tenantid() === ifckxwyk) {
+		message.emit('logout')
+	} else {
+		if (window.document.referrer.indexOf('/isrm.zte.com.cn') > -1) {
 			window.open(
 				domainName.sccUrl
 			)
-		}else{
+		} else {
 			message.emit('logout')
 		}
 	}
