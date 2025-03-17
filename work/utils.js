@@ -468,8 +468,8 @@ export function handleChild(parentArray, child, type) {
 
 //获取数据类型
 export function getType(obj) {
-	var toString = Object.prototype.toString;
-	var map = {
+	let toString = Object.prototype.toString;
+	let map = {
 		'[object Boolean]': 'boolean',
 		'[object Number]': 'number',
 		'[object String]': 'string',
@@ -496,7 +496,7 @@ export function merge(data1, data2) {
 // 克隆对象或数组
 export function deepClone(data) {
 	let type = getType(data);
-	var obj;
+	let obj;
 	if (type === 'array') {
 		obj = [];
 	} else if (type === 'object') {
@@ -506,11 +506,11 @@ export function deepClone(data) {
 		return data;
 	}
 	if (type === 'array') {
-		for (var i = 0, len = data.length; i < len; i++) {
+		for (let i = 0, len = data.length; i < len; i++) {
 			obj.push(deepClone(data[i]));
 		}
 	} else if (type === 'object') {
-		for (var key in data) {
+		for (let key in data) {
 			obj[key] = deepClone(data[key]);
 		}
 	}
